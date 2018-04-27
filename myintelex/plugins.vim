@@ -7,8 +7,14 @@ Plug 'tomasr/molokai'                           " molokai主题
 Plug 'altercation/vim-colors-solarized'         " solarized主题
 Plug 'scrooloose/nerdtree'                      " 侧边文件栏
 Plug 'kien/ctrlp.vim'                           " 文件搜索
-Plug 'majutsushi/tagbar'                        " tags列表 
 Plug 'ludovicchabant/vim-gutentags'             " ctags自动更新
+Plug 'w0rp/ale'                                 " 动态检查
+if has('win32')
+    Plug 'Yggdroot/LeaderF', { 'do': '.\install.bat' }  " tags列表
+elseif has('unix')
+    Plug 'Yggdroot/LeaderF', { 'do': './install.sh' }  " tags列表
+endif
+Plug 'Shougo/echodoc.vim'                        " 参数列表
 Plug 'MarcWeber/vim-addon-mw-utils'
 Plug 'tomtom/tlib_vim'
 Plug 'garbas/vim-snipmate'
@@ -23,12 +29,13 @@ Plug 'asins/vimcdoc'
 call plug#end()
 filetype plugin indent on                       " 恢复文件类型匹配
 
+set runtimepath+=~\github\vim\YouCompleteMe
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 插件配置
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " =>　主题配置------------------------------------------------------------------"
 set background=dark
-colorscheme solarized
+colorscheme molokai
 
 " =>　NERD tree 配置------------------------------------------------------------"
 map <f2> :NERDTreeToggle<cr>                    " 将F2设置为开关NERDTree的快捷键
@@ -53,7 +60,7 @@ let g:ctrlp_cmd = 'CtrlP'                       " <Leader>p搜索当前目录下
 set tags=./.tags;,.tags
 nmap <silent> <F4> :TagbarToggle<CR>            " 设置触发快捷键
 
-" =>　vim-gutentags 配置---------------------------------------------------------------"
+" =>　vim-gutentags 配置--------------------------------------------------------"
 " gutentags 搜索工程目录的标志，碰到这些文件/目录名就停止向上一级目录递归
 let g:gutentags_project_root = ['.root', '.svn', '.git', '.hg', '.project']
 " 所生成的数据文件的名称
@@ -69,6 +76,25 @@ let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
 if !isdirectory(s:vim_tags)
     silent! call mkdir(s:vim_tags, 'p')
 endif
+
+" =>　ALE 动态检查配置----------------------------------------------------------"
+let g:ale_sign_column_always = 1                " 始终显示提示
+let g:ale_sign_error = 'X'                      " 设置错误图标
+let g:ale_sign_warning = '!!'                   " 设置警告图标
+let g:ale_lint_on_text_changed = 'normal'       " normal模式改变内容触发
+let g:ale_lint_on_insert_leave = 1              " insert模式离开触发
+let g:ale_set_quickfix = 1
+let g:airline#extensions#ale#enabled = 1
+nmap <silent> <C-k> <Plug>(ale_previous_wrap)
+nmap <silent> <C-j> <Plug>(ale_next_wrap)
+let g:ale_echo_msg_error_str = 'E'
+let g:ale_echo_msg_warning_str = 'W'
+let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+let g:ale_set_loclist = 0
+let g:ale_set_quickfix = 1
+
+" =>　echodoc 配置--------------------------------------------------------------"
+set noshowmode
 
 " =>　AirLine配置---------------------------------------------------------------"
 let g:airline_theme="solarized"                 " 设置主题
@@ -86,3 +112,48 @@ let guifontpp_smaller_font_map="<M-+>"          " 放大
 let guifontpp_larger_font_map="<M-->"           " 缩小
 let guifontpp_original_font_map="<M-0>"         " 默认大小
 
+" =>　ycm配置-------------------------------------------------------------------"
+let g:ycm_add_preview_to_completeopt = 0
+let g:ycm_show_diagnostics_ui = 0
+let g:ycm_server_log_level = 'info'
+let g:ycm_min_num_identifier_candidate_chars = 2
+let g:ycm_collect_identifiers_from_comments_and_strings = 1
+let g:ycm_complete_in_strings=1
+let g:ycm_key_invoke_completion = '<c-z>'
+let g:ycm_global_ycm_extra_conf = '~\github\vim\YouCompleteMe\third_party\ycmd\cpp\ycm\.ycm_extra_conf.py'
+set completeopt=menu,menuone
+ 
+noremap <c-z> <NOP>
+ 
+let g:ycm_semantic_triggers =  {
+            \ 'c,cpp,python,java,go,erlang,perl': ['re!\w{2}'],
+            \ 'cs,lua,javascript': ['re!\w{2}'],
+            \ }
+
+" =>　LeaderF 配置--------------------------------------------------------------"
+let g:Lf_ShortcutF = '<c-p>'
+let g:Lf_ShortcutB = '<m-n>'
+noremap <c-n> :LeaderfMru<cr>
+noremap <m-p> :LeaderfFunction<cr>
+noremap <m-n> :LeaderfBuffer<cr>
+noremap <m-m> :LeaderfTag<cr>
+let g:Lf_StlSeparator = { 'left': '', 'right': '', 'font': '' }
+ 
+let g:Lf_RootMarkers = ['.project', '.root', '.svn', '.git']
+let g:Lf_WorkingDirectoryMode = 'Ac'
+let g:Lf_WindowHeight = 0.30
+let g:Lf_CacheDirectory = expand('~/.vim/cache')
+let g:Lf_ShowRelativePath = 0
+let g:Lf_HideHelp = 1
+let g:Lf_StlColorscheme = 'powerline'
+ 
+let g:Lf_NormalMap = {
+    \ "File":   [["<ESC>", ':exec g:Lf_py "fileExplManager.quit()"<CR>'],
+    \            ["<F6>", ':exec g:Lf_py "fileExplManager.quit()"<CR>'] ],
+    \ "Buffer": [["<ESC>", ':exec g:Lf_py "bufExplManager.quit()"<CR>'],
+    \            ["<F6>", ':exec g:Lf_py "bufExplManager.quit()"<CR>'] ],
+    \ "Mru":    [["<ESC>", ':exec g:Lf_py "mruExplManager.quit()"<CR>']],
+    \ "Tag":    [["<ESC>", ':exec g:Lf_py "tagExplManager.quit()"<CR>']],
+    \ "Function":    [["<ESC>", ':exec g:Lf_py "functionExplManager.quit()"<CR>']],
+    \ "Colorscheme":    [["<ESC>", ':exec g:Lf_py "colorschemeExplManager.quit()"<CR>']],
+    \ }
