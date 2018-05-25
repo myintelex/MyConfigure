@@ -25,7 +25,7 @@ set ffs=unix,dos,mac                            " 设置换行符格式
 set backspace=eol,start,indent                  " 退格键使用
 set winaltkeys=no								" 禁用Alt键
 if has('mouse')
-	"set mouse=c
+	set mouse=c
 endif											" 鼠标仅在命令行下使用
 set whichwrap+=<,>,h,l                          " 光标移动折行功能
 
@@ -145,7 +145,7 @@ noremap <silent><tab>n :tabn<cr>
 noremap <silent><tab>p :tabp<cr>
 noremap <silent><tab>f <c-i>
 noremap <silent><tab>b <c-o>
-noremap <silent>\t :tabnew<cr>
+noremap <silent>\t :tabnew<cr>:Startify<cr>
 noremap <silent>\g :tabclose<cr>
 noremap <silent>\1 :tabn 1<cr>
 noremap <silent>\2 :tabn 2<cr>

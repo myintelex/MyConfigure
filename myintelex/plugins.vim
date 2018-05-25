@@ -1,4 +1,4 @@
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"str_send""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 插件列表
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call plug#begin()
@@ -14,6 +14,7 @@ if has('win32')
 elseif has('unix')
     Plug 'Yggdroot/LeaderF', { 'do': './install.sh' }  " tags列表
 endif
+Plug 'mhinz/vim-startify'                        " 启动界面
 Plug 'Shougo/echodoc.vim'                        " 参数列表
 Plug 'MarcWeber/vim-addon-mw-utils'
 Plug 'tomtom/tlib_vim'
@@ -45,10 +46,10 @@ let g:NERDTreeWinPos='left'                     " 窗口位置
 let g:NERDTreeSize=30                           " 窗口尺寸
 let g:NERDTreeShowLineNumbers=0                 " 窗口是否显示行号
 let g:NERDTreeHidden=0                          " 不显示隐藏文件
-autocmd vimenter * if !argc()|NERDTree|endif    " 打开vim没有文件自动打开NERDTree
+"autocmd vimenter * if !argc()|NERDTree|endif    " 打开vim没有文件自动打开NERDTree
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
                                                 " 当NERDTree为唯一窗口时自动关闭
-autocmd vimenter * NERDTree</cr></f2>           " 打开vim时自动打开NERDTree
+""autocmd vimenter * NERDTree</cr></f2>           " 打开vim时自动打开NERDTree
 
 " =>　ctrlp配置-----------------------------------------------------------------"
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.png,*.jpg,*.jpeg,*.gif 
@@ -56,13 +57,10 @@ let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
 let g:ctrlp_map = '<Leader>p'
 let g:ctrlp_cmd = 'CtrlP'                       " <Leader>p搜索当前目录下文件
 
-" =>　tagbar 配置---------------------------------------------------------------"
-set tags=./.tags;,.tags
-nmap <silent> <F4> :TagbarToggle<CR>            " 设置触发快捷键
-
 " =>　vim-gutentags 配置--------------------------------------------------------"
 " gutentags 搜索工程目录的标志，碰到这些文件/目录名就停止向上一级目录递归
 let g:gutentags_project_root = ['.root', '.svn', '.git', '.hg', '.project']
+
 " 所生成的数据文件的名称
 let g:gutentags_ctags_tagfile = '.tags'
 " 将自动生成的 tags 文件全部放入 ~/.cache/tags 目录中，避免污染工程目录
@@ -81,25 +79,78 @@ endif
 let g:ale_sign_column_always = 1                " 始终显示提示
 let g:ale_sign_error = 'X'                      " 设置错误图标
 let g:ale_sign_warning = '!!'                   " 设置警告图标
-let g:ale_lint_on_text_changed = 'normal'       " normal模式改变内容触发
-let g:ale_lint_on_insert_leave = 1              " insert模式离开触发
-let g:ale_set_quickfix = 1
-let g:airline#extensions#ale#enabled = 1
 nmap <silent> <C-k> <Plug>(ale_previous_wrap)
 nmap <silent> <C-j> <Plug>(ale_next_wrap)
-let g:ale_echo_msg_error_str = 'E'
-let g:ale_echo_msg_warning_str = 'W'
-let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
-let g:ale_set_loclist = 0
-let g:ale_set_quickfix = 1
+
+" =>　Startify 配置--------------------------------------------------------------"
+"设置书签
+let g:startify_bookmarks            = [
+            \ '~/Project/test.cpp',
+            \]
+"起始页显示的列表长度
+let g:startify_files_number = 10
+"自动加载session
+let g:tsartify_session_autoload = 1
+"过滤列表，支持正则表达式
+let g:startify_skiplist = [
+       \ '^/tmp',
+       \ ]
+"自定义Header和Footer
+let g:startify_custom_header = [
+            \ '+-------------------------------------------------------------------------+',
+            \ '|                            ---KEEP CODING!---                           |',
+            \ '+-------------------------------------------------------------------------+',
+            \]
+let g:startify_custom_footer = [
+            \ '+-------------------------------------------------------------------------+',
+            \ '|   SHORTCUT KEY DESCRIPTION                                              |',
+            \ '|   F2         :  Open the NERDTree                                       |',
+            \ '|   leader     :  the leader is " "                                       |',
+            \ '|   leader <cr>:  :noh                                                    |',
+            \ '|   leader    P:  ctrlP-show the files                                    |',
+            \ '|   leader    w:  :w!                                                     |',
+            \ '|   leader    w:  :w!                                                     |',
+            \ '|   leader    q:  :q!                                                     |',
+            \ '|   leader   bd:  buff delete                                             |',
+            \ '|   leader    ]:  buff next                                               |',
+            \ '|   leader    [:  buff prev                                               |',
+            \ '|   ctrl      h:  move h                                                  |',
+            \ '|   ctrl      j:  move j                                                  |',
+            \ '|   ctrl      k:  move k                                                  |',
+            \ '|   ctrl      l:  move l                                                  |',
+            \ '|   ctrl      l:  move l                                                  |',
+            \ '|   ctrl    tab:  tab prev                                                |',
+            \ '|   ctrl      k:  ALE-errorCheck next                                     |',
+            \ '|   ctrl      j:  ALE-errorChec before                                    |',
+            \ '|   ctrl      P:  ctrlP-show                                              |',
+            \ '|   ctrl      n:  LeaderF-Most recent used                                |',
+            \ '|   alt       p:  LeaderF-function                                        |',
+            \ '|   alt       n:  LeaderF-buffer                                          |',
+            \ '|   alt       m:  LeaderF-Tag                                             |',
+            \ '|   alt       +:  font zoom in                                            |',
+            \ '|   alt       -:  font zoom out                                           |',
+            \ '|   alt       0:  font recovery                                           |',
+            \ '|   alt   [num]:  tab [num]                                               |',
+            \ '|   tab       h:  split window h                                          |',
+            \ '|   tab       j:  split window j                                          |',
+            \ '|   tab       l:  split window l                                          |',
+            \ '|   tab       k:  split window k                                          |',
+            \ '|   tab       w:  split window w                                          |',
+            \ '|   tab       m:  tab new                                                 |',
+            \ '|   tab       e:  tab close                                               |',
+            \ '|   tab       n:  tab next                                                |',
+            \ '|   tab       p:  tab prev                                                |',
+            \ '|   \t         :  tab new                                                 |',
+            \ '|   \g         :  tab close                                               |',
+            \ '+-------------------------------------------------------------------------+',
+            \]
 
 " =>　echodoc 配置--------------------------------------------------------------"
 set noshowmode
-
+ 
 " =>　AirLine配置---------------------------------------------------------------"
 let g:airline_theme="solarized"                 " 设置主题
 let g:airline_solarized_bg='light'              " 设置主题背景
-let g:airline_powerline_fonts = 1               " 设置使用powerline字体            
 
 let g:airline#extensions#tabline#enabled = 1    " 打开tabline功能
 let g:airline#extensions#tabline#buffer_nr_show = 1
@@ -111,7 +162,7 @@ let guifontpp_size_increment=1                  " 每次更改的字号
 let guifontpp_smaller_font_map="<M-+>"          " 放大
 let guifontpp_larger_font_map="<M-->"           " 缩小
 let guifontpp_original_font_map="<M-0>"         " 默认大小
-
+ 
 " =>　ycm配置-------------------------------------------------------------------"
 let g:ycm_add_preview_to_completeopt = 0
 let g:ycm_show_diagnostics_ui = 0
@@ -119,12 +170,8 @@ let g:ycm_server_log_level = 'info'
 let g:ycm_min_num_identifier_candidate_chars = 2
 let g:ycm_collect_identifiers_from_comments_and_strings = 1
 let g:ycm_complete_in_strings=1
-let g:ycm_key_invoke_completion = '<c-z>'
 let g:ycm_global_ycm_extra_conf = '~\github\vim\YouCompleteMe\third_party\ycmd\cpp\ycm\.ycm_extra_conf.py'
 set completeopt=menu,menuone
- 
-noremap <c-z> <NOP>
- 
 let g:ycm_semantic_triggers =  {
             \ 'c,cpp,python,java,go,erlang,perl': ['re!\w{2}'],
             \ 'cs,lua,javascript': ['re!\w{2}'],
